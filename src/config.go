@@ -19,6 +19,8 @@ type ServerConfig struct {
 	TLSKey     string
 	TLSCert    string
 	StaticDir  string
+	PostsDir   string
+	PagesDir   string
 	ErrorLog   string
 	AccessLog  string
 	ProxyCount uint
@@ -36,6 +38,8 @@ func loadConfig(dir string) (*Config, error) {
 	viper.SetDefault("server.tls_key", "")
 	viper.SetDefault("server.tls_cert", "")
 	viper.SetDefault("server.static_dir", "")
+	viper.SetDefault("server.posts_dir", "")
+	viper.SetDefault("server.pages_dir", "")
 	viper.SetDefault("server.error_log", "")
 	viper.SetDefault("server.access_log", "")
 	viper.SetDefault("site.title", "My Blog")
@@ -65,6 +69,9 @@ func loadConfig(dir string) (*Config, error) {
 			ForceTLS:   viper.GetBool("server.force_tls"),
 			TLSKey:     viper.GetString("server.tls_key"),
 			TLSCert:    viper.GetString("server.tls_cert"),
+			StaticDir:  viper.GetString("server.static_dir"),
+			PostsDir:   viper.GetString("server.posts_dir"),
+			PagesDir:   viper.GetString("server.pages_dir"),
 			AccessLog:  viper.GetString("server.access_log"),
 			ErrorLog:   viper.GetString("server.error_log"),
 			ProxyCount: viper.GetUint("server.proxy_count"),

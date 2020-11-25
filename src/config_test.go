@@ -40,6 +40,8 @@ server:
     tls_key:     %s
     tls_cert:    %s
     static_dir:  %s
+    posts_dir:   %s
+    pages_dir:   %s
     access_log:  %s
     error_log:   %s
     proxy_count: %d
@@ -59,6 +61,8 @@ func yamlFromConfig(c *Config) string {
 		c.ServerConfig.TLSKey,
 		c.ServerConfig.TLSCert,
 		c.ServerConfig.StaticDir,
+		c.ServerConfig.PostsDir,
+		c.ServerConfig.PagesDir,
 		c.ServerConfig.AccessLog,
 		c.ServerConfig.ErrorLog,
 		c.ServerConfig.ProxyCount,
@@ -82,6 +86,9 @@ func TestLoadConfig(t *testing.T) {
 			ForceTLS:   true,
 			TLSKey:     filepath.Join("path", "to", "key.pem"),
 			TLSCert:    filepath.Join("path", "to", "cert.pem"),
+			StaticDir:  filepath.Join("path", "to", "static"),
+			PostsDir:   filepath.Join("path", "to", "posts"),
+			PagesDir:   filepath.Join("path", "to", "pages"),
 			AccessLog:  filepath.Join("path", "to", "access.log"),
 			ErrorLog:   filepath.Join("path", "to", "error.log"),
 			ProxyCount: 1,
