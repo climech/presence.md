@@ -18,7 +18,7 @@
 
 ## Configuration
 
-Refer to the self-explanatory `config.yaml` in the example config directory.
+Refer to the self-documented `config.yaml` in the example config directory.
 
 ## Usage
 
