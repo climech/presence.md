@@ -1,11 +1,14 @@
-package main
+package app
 
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"testing"
 	"time"
+
+	"presence/config"
 )
 
 var tmpdir string
@@ -16,13 +19,13 @@ func setup(t *testing.T) *App {
 		t.Fatal(err)
 	}
 
-	config := &Config{
-		&SiteConfig{
+	conf := &config.Config{
+		&config.SiteConfig{
 			Title:             "Test Blog",
 			Author:            "John Doe",
 			MaxEntriesPerPage: 5,
 		},
-		&ServerConfig{
+		&config.ServerConfig{
 			Port:       9001,
 			StaticDir:  filepath.Join(tmpdir, "static"),
 			PostsDir:   filepath.Join(tmpdir, "posts"),
@@ -33,16 +36,16 @@ func setup(t *testing.T) *App {
 		},
 	}
 
-	app, err := NewApp(config)
+	a, err := NewApp(conf)
 	if err != nil {
-		t.Fatalf("couldn't create app: %v", err)
+		t.Fatalf("couldn't create App: %v", err)
 	}
 
-	return app
+	return a
 }
 
-func teardown(t *testing.T, app *App) {
-	if err := app.Close(); err != nil {
+func teardown(t *testing.T, a *App) {
+	if err := a.Close(); err != nil {
 		t.Error(err)
 	}
 	if err := os.RemoveAll(tmpdir); err != nil {
@@ -50,9 +53,9 @@ func teardown(t *testing.T, app *App) {
 	}
 }
 
-func createPost(app *App, slug, title, body string) error {
+func createPost(a *App, slug, title, body string) error {
 	md := fmt.Sprintf("# %s\n\n%s", title, body)
-	fp := filepath.Join(app.Config.PostsDir, fmt.Sprintf("%s.md", slug))
+	fp := filepath.Join(a.Config.PostsDir, fmt.Sprintf("%s.md", slug))
 	if err := ioutil.WriteFile(fp, []byte(text), 0644); err != nil {
 		return err
 	}
@@ -62,17 +65,17 @@ func createPost(app *App, slug, title, body string) error {
 }
 
 func TestArticles(t *testing.T) {
-	app := setup(t)
-	defer teardown(t, app)
+	a := setup(t)
+	defer teardown(t, a)
 
 	slug := "hello-world"
 	title := "Hello world!"
 	body := "This is a blog post."
-	createPost(app, slug, title, body)
+	createPost(a, slug, title, body)
 
 	// The post should exist in the cache.
 	{
-		article := app.GetPost(slug)
+		article := a.GetPost(slug)
 		if article == nil {
 			t.Fatal("article is nil, want non-nil")
 		}
@@ -89,27 +92,27 @@ func TestArticles(t *testing.T) {
 	oldSlug := slug
 	slug = "test"
 	{
-		from := filepath.Join(app.PostsDir, oldSlug+".md")
-		to := filepath.Join(app.PostsDir, slug+".md")
+		from := filepath.Join(a.Config.PostsDir, oldSlug+".md")
+		to := filepath.Join(a.Config.PostsDir, slug+".md")
 		os.Rename(from, to)
 		time.Sleep(0.1)
 
-		if a := app.GetPost(slug); a == nil {
+		if a.GetPost(slug) == nil {
 			t.Error("article not accessible by new slug after rename")
 		}
-		if a := app.GetPost(oldSlug); a == nil {
+		if a.GetPost(oldSlug) == nil {
 			t.Error("article still accessible by old slug after rename")
 		}
 	}
 
 	// Post shouldn't exist in cache after deleting the file.
 	{
-		err := os.Remove(filepath.Join(app.PostsDir, slug+".md"))
+		err := os.Remove(filepath.Join(a.Config.PostsDir, slug+".md"))
 		time.Sleep(0.1)
 		if err != nil {
 			t.Fatal(err)
 		}
-		if a := app.GetPost(slug); a == nil {
+		if a.GetPost(slug) == nil {
 			t.Error("article still accessible after deletion")
 		}
 	}
