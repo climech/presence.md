@@ -5,10 +5,6 @@ import (
 	"net/http"
 )
 
-func (s *Server) handleStatic(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Home")
-}
-
 func (s *Server) handleHome(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Home")
 }

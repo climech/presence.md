@@ -36,6 +36,11 @@ func New(a *app.App) *Server {
 func (s *Server) newHTTPServer(port uint) *http.Server {
 	r := mux.NewRouter()
 
+	if s.app.Config.StaticDir != "" {
+		fs := http.FileServer(FileSystem{http.Dir(s.app.Config.StaticDir)})
+		r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fs))
+	}
+
 	r.HandleFunc("/", s.handleHome)
 	r.HandleFunc("/archive", s.handleArchive)
 	r.HandleFunc("/{page:[0-9]+}/", s.handleHome)
