@@ -17,6 +17,9 @@ func (fs FileSystem) Open(path string) (http.File, error) {
 		return nil, err
 	}
 	s, err := f.Stat()
+	if err != nil {
+		return nil, err
+	}
 	if s.IsDir() {
 		return nil, os.ErrNotExist
 	}
