@@ -102,7 +102,7 @@ func TestLoadConfig(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	got, err := loadConfig(tmpdir)
+	got, err := LoadConfig(tmpdir)
 	if err != nil {
 		t.Fatalf("couldn't load test config: %s", err)
 	}

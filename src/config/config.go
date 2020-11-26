@@ -31,7 +31,7 @@ type Config struct {
 	*ServerConfig
 }
 
-func loadConfig(dir string) (*Config, error) {
+func LoadConfig(dir string) (*Config, error) {
 	viper.SetDefault("server.port", 9001)
 	viper.SetDefault("server.port_tls", 0)
 	viper.SetDefault("server.force_tls", false)
