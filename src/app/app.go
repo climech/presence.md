@@ -7,6 +7,10 @@ import (
 	"presence/store"
 )
 
+const AppName = "presence"
+
+var Version = "" // injected on build
+
 type App struct {
 	Config *config.Config
 	posts  *store.ArticleStore
@@ -49,4 +53,9 @@ func (a *App) GetPage(slug string) *model.Article {
 
 func (a *App) GetAllPages() []*model.Article {
 	return a.pages.GetAll()
+}
+
+func (a *App) Close() {
+	a.posts.Close()
+	a.pages.Close()
 }
