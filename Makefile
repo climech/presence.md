@@ -1,27 +1,32 @@
 APPNAME = presence
 VERSION = $(shell git describe --long --always --dirty 2>/dev/null || echo -n 'v0.1')
 GO = go
-GOMODULE = main
+GOMODULE = presence
 GOPATH ?= $(shell mktemp -d)
-CWD = $(shell pwd)
 PREFIX ?= /usr
 BINDIR ?= ${PREFIX}/bin
-BUILDDIR = .
+CWD = $(shell pwd)
 
 all: build
 
 build:
-	${GO} build -v \
-		-o ${BUILDDIR}/${APPNAME} \
-		-ldflags "-X '${GOMODULE}.Version=${VERSION}'" \
+	@env -C "${CWD}/src" ${GO} build \
+		-v \
+		-o "${CWD}/${APPNAME}" \
+		-ldflags "-X '${GOMODULE}.app.Version=${VERSION}'" \
 		"${CWD}/src" \
-		&& echo "-> ${BUILDDIR}/${APPNAME}" \
-		|| echo "*** Build failed ***" 1>&2; \
+		&& echo "-> ${APPNAME}" \
+		|| echo "*** Build failed ***" 1>&2;
+
+test:
+	@env -C "${CWD}/src" ${GO} test -count=1 \
+		./config \
+		./store
 
 install: ${APPNAME}
-	@install -v -D -t ${DESTDIR}${BINDIR} ${APPNAME}
+	@install -v -D -t "${DESTDIR}${BINDIR}" ${APPNAME}
 
 clean: ${APPNAME}
 	@rm -rf ${APPNAME}
 
-.PHONY: build
+.PHONY: build test
