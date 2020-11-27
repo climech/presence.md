@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>{{.Title}}</title>
+		{{template "meta" .}}
+	</head>
+	<body>
+		<div id="root">
+
+			<header>
+				<h1 class="title">{{.Title}}</h1>
+				<nav>
+					<a class="selected" href="/">Home</a>
+					<a href="/archive">Archive</a>
+					{{range .Pages}}
+						<a href="/{{.Slug}}">{{.Title}}</a>
+					{{end}}
+				</nav>
+			</header>
+
+			<main>
+				{{if .Posts}}
+					{{range $i, $post := .Posts}}
+						{{if gt $i 0}}<div class="separator">* * *</div>{{end}}
+						<article>
+							<header>
+								{{if $post.Date }}
+									<span class="date"><a href="/{{$post.Slug}}">{{$post.Date}}</a></span>
+								{{end}}
+								{{if $post.Title}}
+								<h1 class="title"><a href="/{{$post.Slug}}">{{$post.Title}}</a></h1>
+								{{end}}
+							</header>
+							<main>
+								{{$post.Body}}
+							</main>
+						</article>
+					{{end}}
+				{{else}}
+						<div class="separator">No posts.</div>
+				{{end}}
+
+				<nav class="pages">
+					{{if .Previous}}<span><a href="/{{.Previous}}/">« Newer</a></span>{{end}}
+					{{if .Next}}<span><a href="/{{.Next}}/">Older »</a></span>{{end}}
+				</nav>
+			</main>
+
+			<footer>
+				{{template "footer" .}}
+			</footer>
+
+		</div>
+	</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Archive &ndash; {{.Title}}</title>
+		{{template "meta" .}}
+	</head>
+	<body>
+		<div id="root">
+
+			<header>
+				<h1 class="title">{{.Title}}</h1>
+				<nav>
+					<a href="/">Home</a>
+					<a href="/archive" class="selected">Archive</a>
+					{{range .Pages}}
+						<a href="/{{.Slug}}">{{.Title}}</a>
+					{{end}}
+				</nav>
+			</header>
+
+			<main>
+				<article>
+					<header>
+						<h1 class="title">Archive</h1>
+					</header>
+					<main>
+						{{if .Years}}
+							{{range .Years}}
+								<h2>{{.Year}}</h2>
+								<ul>
+									{{range .Posts}}
+										<li><a href="/{{.Slug}}">{{.Title}}</a></li>
+									{{end}}
+								</ul>
+							{{end}}
+						{{else}}
+							<p>No posts.</p>
+						{{end}}
+					</main>
+				</article>
+			</main>
+
+			<footer>
+				{{template "footer" .}}
+			</footer>
+
+		</div>
+	</body>
+</html>

@@ -1,0 +1,47 @@
+site:
+    title: "My Blog"
+    description: John Doe's hot takes on various matters
+    author: John Doe
+    max_entries_per_page: 10
+  
+    # Date format for dates displayed to visitors.
+    # See: https://man7.org/linux/man-pages/man3/strftime.3.html
+    date_format: "%F"
+
+server:
+    # Set host to your domain on a live server.
+    host: 127.0.0.1
+
+    # Port for insecure requests. Set to 80 on a live server.
+    port: 9001
+  
+    # Port for handling secure requests. Set to 443 on a live server.
+    # Requires tls_key and tls_cert to be set as well.
+    #port_tls: 0
+  
+    # Redirect HTTP requests to HTTPS (recommended).
+    #force_tls: false
+
+    # Paths to TLS keys.
+    #tls_key: './tls/key.pem'
+    #tls_cert: './tls/cert.pem'
+  
+    # Directory for blog posts.
+    posts_dir: './posts'
+
+    # Directory for pages accessible from the navigation bar.
+    pages_dir: './pages'
+  
+    # Directory for arbitrary static files.
+    static_dir: './static'
+
+    # Directory for template files.
+    templates_dir: './templates'
+  
+    # Paths to log files.
+    access_log: './logs/access.log'
+  
+    # Set this to 1 or higher if you want to run the server behind a proxy,
+    # e.g. nginx. This is required for proper handling of X-Forwarded-For
+    # headers.
+    #proxy_count: 0

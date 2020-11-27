@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>{{.Article.Title}} &ndash; {{.Title}}</title>
+		{{template "meta" .}}
+	</head>
+	<body>
+		<div id="root">
+
+			<header>
+				<h1 class="title">{{.Title}}</h1>
+				<nav>
+					<a href="/">Home</a>
+					<a href="/archive">Archive</a>
+					{{range .Pages}}
+						<a href="/{{.Slug}}">{{.Title}}</a>
+					{{end}}
+				</nav>
+			</header>
+
+			<main>
+				<article>
+					<header>
+						{{if .Article.Date }}
+							<span class="date">{{.Article.Date}}</span>
+						{{end}}
+						{{if .Article.Title}}
+						<h1 class="title">{{.Article.Title}}</h1>
+						{{end}}
+					</header>
+					<main>
+						{{.Article.Body}}
+					</main>
+				</article>
+			</main>
+
+			<footer>
+				{{template "footer" .}}
+			</footer>
+
+		</div>
+	</body>
+</html>
