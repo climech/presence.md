@@ -19,8 +19,8 @@ func main() {
 		dief("couldn't load home: %v", err)
 	}
 
-	dir := filepath.Join(home, ".config", APPNAME)
-	conf, err := config.LoadConfig(dir)
+	homeconf := filepath.Join(home, ".config", APPNAME)
+	conf, err := config.LoadConfig(homeconf, "/etc/presence")
 	if err != nil {
 		dief("couldn't load config: %v", err)
 	}

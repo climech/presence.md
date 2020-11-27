@@ -46,7 +46,7 @@ func expandPath(path, home, cwd string) string {
 	return path
 }
 
-func LoadConfig(dir string) (*Config, error) {
+func LoadConfig(paths ...string) (*Config, error) {
 	viper.SetDefault("server.host", "127.0.0.1")
 	viper.SetDefault("server.port", 9001)
 	viper.SetDefault("server.port_tls", 0)
@@ -65,7 +65,9 @@ func LoadConfig(dir string) (*Config, error) {
 	viper.SetDefault("site.max_entries_per_page", 10)
 	viper.SetDefault("site.date_format", "%F")
 
-	viper.AddConfigPath(dir)
+	for _, p := range paths {
+		viper.AddConfigPath(p)
+	}
 	viper.SetConfigName("config")
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
@@ -77,7 +79,6 @@ func LoadConfig(dir string) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	cwd := ""
 	if fp := viper.ConfigFileUsed(); fp != "" {
 		cwd = filepath.Dir(fp)
