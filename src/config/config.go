@@ -1,6 +1,10 @@
 package config
 
 import (
+	"os"
+	"path/filepath"
+	"strings"
+
 	"github.com/spf13/viper"
 )
 
@@ -33,6 +37,15 @@ type Config struct {
 	*ServerConfig
 }
 
+func expandPath(path, home, cwd string) string {
+	if strings.HasPrefix(path, "~/") {
+		return filepath.Join(home, path[2:])
+	} else if strings.HasPrefix(path, "./") {
+		return filepath.Join(cwd, path[2:])
+	}
+	return path
+}
+
 func LoadConfig(dir string) (*Config, error) {
 	viper.SetDefault("server.host", "127.0.0.1")
 	viper.SetDefault("server.port", 9001)
@@ -60,6 +73,16 @@ func LoadConfig(dir string) (*Config, error) {
 		}
 	}
 
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return nil, err
+	}
+
+	cwd := ""
+	if fp := viper.ConfigFileUsed(); fp != "" {
+		cwd = filepath.Dir(fp)
+	}
+
 	config := &Config{
 		&SiteConfig{
 			Title:             viper.GetString("site.title"),
@@ -73,14 +96,14 @@ func LoadConfig(dir string) (*Config, error) {
 			Port:         viper.GetUint("server.port"),
 			PortTLS:      viper.GetUint("server.port_tls"),
 			ForceTLS:     viper.GetBool("server.force_tls"),
-			TLSKey:       viper.GetString("server.tls_key"),
-			TLSCert:      viper.GetString("server.tls_cert"),
-			StaticDir:    viper.GetString("server.static_dir"),
-			PostsDir:     viper.GetString("server.posts_dir"),
-			PagesDir:     viper.GetString("server.pages_dir"),
-			TemplatesDir: viper.GetString("server.templates_dir"),
-			AccessLog:    viper.GetString("server.access_log"),
-			ErrorLog:     viper.GetString("server.error_log"),
+			TLSKey:       expandPath(viper.GetString("server.tls_key"), home, cwd),
+			TLSCert:      expandPath(viper.GetString("server.tls_cert"), home, cwd),
+			StaticDir:    expandPath(viper.GetString("server.static_dir"), home, cwd),
+			PostsDir:     expandPath(viper.GetString("server.posts_dir"), home, cwd),
+			PagesDir:     expandPath(viper.GetString("server.pages_dir"), home, cwd),
+			TemplatesDir: expandPath(viper.GetString("server.templates_dir"), home, cwd),
+			AccessLog:    expandPath(viper.GetString("server.access_log"), home, cwd),
+			ErrorLog:     expandPath(viper.GetString("server.error_log"), home, cwd),
 			ProxyCount:   viper.GetUint("server.proxy_count"),
 		},
 	}
