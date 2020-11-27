@@ -1,7 +1,6 @@
 package model
 
 import (
-	"html/template"
 	"time"
 )
 
@@ -12,5 +11,5 @@ type Article struct {
 	PubTime  *time.Time
 	Filename string
 	BodyRaw  []byte
-	BodyHTML template.HTML
+	BodyHTML string
 }

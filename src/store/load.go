@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"html/template"
 	"io"
 	"io/ioutil"
 	"path/filepath"
@@ -50,7 +49,7 @@ func (as *ArticleStore) loadArticle(filename string) (*model.Article, error) {
 		PubTime:  pubtime,
 		Title:    title,
 		BodyRaw:  contents,
-		BodyHTML: template.HTML(buf.String()),
+		BodyHTML: buf.String(),
 		Filename: filename,
 	}
 

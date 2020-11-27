@@ -29,6 +29,7 @@ func NewArticleStore(dirpath string) (*ArticleStore, error) {
 		return nil, err
 	}
 	as.initMarkdown()
+	as.initArticles()
 	return as, nil
 }
 

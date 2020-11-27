@@ -3,10 +3,13 @@ package server
 import (
 	"context"
 	"fmt"
+	"html/template"
 	"log"
 	"net"
 	"net/http"
-	"net/url"
+	"os"
+	"path"
+	"path/filepath"
 	"presence/app"
 	"presence/logger"
 	"strings"
@@ -21,16 +24,51 @@ type Server struct {
 	app       *app.App
 	srv       *http.Server
 	srvtls    *http.Server
+	templates map[string]*template.Template
 	accessLog *logger.Logger
 	done      chan struct{}
 	once      sync.Once
 }
 
-func New(a *app.App) *Server {
-	return &Server{
+func New(a *app.App) (*Server, error) {
+	s := &Server{
 		app:       a,
 		accessLog: logger.NewLogger(),
 	}
+
+	if s.app.Config.AccessLog == "" {
+		s.accessLog = logger.NewLogger()
+	} else {
+		l, err := logger.NewFileLogger(s.app.Config.AccessLog, true)
+		if err != nil {
+			return nil, err
+		}
+		s.accessLog = l
+	}
+
+	if err := s.initServers(); err != nil {
+		return nil, err
+	}
+	if err := s.initTemplates(); err != nil {
+		return nil, fmt.Errorf("couldn't init templates: %v", err)
+	}
+
+	return s, nil
+}
+
+func (s *Server) BaseURL() string {
+	if s.app.Config.PortTLS != 0 {
+		var port string
+		if s.app.Config.PortTLS != 443 {
+			port = fmt.Sprintf(":%d", s.app.Config.PortTLS)
+		}
+		return "https://" + s.app.Config.Host + port
+	}
+	var port string
+	if s.app.Config.Port != 80 {
+		port = fmt.Sprintf(":%d", s.app.Config.Port)
+	}
+	return "http://" + s.app.Config.Host + port
 }
 
 func (s *Server) newHTTPServer(port uint) *http.Server {
@@ -39,9 +77,12 @@ func (s *Server) newHTTPServer(port uint) *http.Server {
 	if s.app.Config.StaticDir != "" {
 		fs := http.FileServer(FileSystem{http.Dir(s.app.Config.StaticDir)})
 		r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fs))
+	} else {
+		log.Println("warning: unset static_dir - not serving static files")
 	}
 
 	r.HandleFunc("/", s.handleHome)
+	r.HandleFunc("/rss.xml", s.handleRSS)
 	r.HandleFunc("/archive", s.handleArchive)
 	r.HandleFunc("/{page:[0-9]+}/", s.handleHome)
 	r.HandleFunc("/{slug:[a-zA-Z0-9_-]+}", s.handleArticle)
@@ -58,12 +99,7 @@ func (s *Server) newHTTPServer(port uint) *http.Server {
 
 func (s *Server) newTLSRedirectServer() *http.Server {
 	redirect := func(w http.ResponseWriter, r *http.Request) {
-		u := url.URL{
-			Scheme: "https",
-			Host:   r.Host,
-			Path:   r.URL.Path,
-		}
-		http.Redirect(w, r, u.String(), 301)
+		http.Redirect(w, r, path.Join(s.BaseURL(), r.URL.Path), 301)
 	}
 	return &http.Server{
 		Addr:         fmt.Sprintf(":%d", s.app.Config.Port),
@@ -73,7 +109,7 @@ func (s *Server) newTLSRedirectServer() *http.Server {
 	}
 }
 
-// initServers initializes the servers based on app config.
+// initServers initializes the http.Servers based on app config.
 func (s *Server) initServers() error {
 	if s.app.Config.Port == 0 {
 		return fmt.Errorf("HTTP port is not set; check your configuration")
@@ -90,6 +126,38 @@ func (s *Server) initServers() error {
 	if s.srv == nil {
 		s.srv = s.newHTTPServer(s.app.Config.Port)
 	}
+	return nil
+}
+
+func (s *Server) initTemplates() error {
+	dir := s.app.Config.TemplatesDir
+	if dir == "" {
+		return fmt.Errorf("templates_dir must be set")
+	}
+	// Create the dir and its parents if they don't exist.
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return err
+	}
+	templates := make(map[string]*template.Template)
+	filepaths := []string{
+		filepath.Join(dir, "home.html"),
+		filepath.Join(dir, "article.html"),
+		filepath.Join(dir, "archive.html"),
+	}
+	// Group templates with their dependencies.
+	common := []string{
+		filepath.Join(dir, "meta.html"),
+		filepath.Join(dir, "footer.html"),
+	}
+	for _, filepath := range filepaths {
+		group := append([]string{filepath}, common...)
+		t, err := template.ParseFiles(group...)
+		if err != nil {
+			return err
+		}
+		templates[t.Name()] = t
+	}
+	s.templates = templates
 	return nil
 }
 
@@ -115,9 +183,6 @@ func (s *Server) getRemoteAddressForRequest(r *http.Request) string {
 func (s *Server) Run() error {
 	if s.done != nil {
 		panic("Server.Run called twice")
-	}
-	if err := s.initServers(); err != nil {
-		return err
 	}
 
 	s.done = make(chan struct{})
