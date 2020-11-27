@@ -13,17 +13,19 @@ type SiteConfig struct {
 }
 
 type ServerConfig struct {
-	Port       uint
-	PortTLS    uint
-	ForceTLS   bool
-	TLSKey     string
-	TLSCert    string
-	StaticDir  string
-	PostsDir   string
-	PagesDir   string
-	ErrorLog   string
-	AccessLog  string
-	ProxyCount uint
+	Host         string
+	Port         uint
+	PortTLS      uint
+	ForceTLS     bool
+	TLSKey       string
+	TLSCert      string
+	StaticDir    string
+	PostsDir     string
+	PagesDir     string
+	TemplatesDir string
+	ErrorLog     string
+	AccessLog    string
+	ProxyCount   uint
 }
 
 type Config struct {
@@ -32,6 +34,7 @@ type Config struct {
 }
 
 func LoadConfig(dir string) (*Config, error) {
+	viper.SetDefault("server.host", "127.0.0.1")
 	viper.SetDefault("server.port", 9001)
 	viper.SetDefault("server.port_tls", 0)
 	viper.SetDefault("server.force_tls", false)
@@ -40,15 +43,16 @@ func LoadConfig(dir string) (*Config, error) {
 	viper.SetDefault("server.static_dir", "")
 	viper.SetDefault("server.posts_dir", "")
 	viper.SetDefault("server.pages_dir", "")
+	viper.SetDefault("server.templates_dir", "")
 	viper.SetDefault("server.error_log", "")
 	viper.SetDefault("server.access_log", "")
 	viper.SetDefault("site.title", "My Blog")
 	viper.SetDefault("site.author", "John Doe")
 	viper.SetDefault("site.description", "John Doe's personal blog")
 	viper.SetDefault("site.max_entries_per_page", 10)
+	viper.SetDefault("site.date_format", "%F")
 
 	viper.AddConfigPath(dir)
-	viper.AddConfigPath("./config")
 	viper.SetConfigName("config")
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
@@ -62,19 +66,22 @@ func LoadConfig(dir string) (*Config, error) {
 			Author:            viper.GetString("site.author"),
 			Description:       viper.GetString("site.description"),
 			MaxEntriesPerPage: viper.GetUint("site.max_entries_per_page"),
+			DateFormat:        viper.GetString("site.date_format"),
 		},
 		&ServerConfig{
-			Port:       viper.GetUint("server.port"),
-			PortTLS:    viper.GetUint("server.port_tls"),
-			ForceTLS:   viper.GetBool("server.force_tls"),
-			TLSKey:     viper.GetString("server.tls_key"),
-			TLSCert:    viper.GetString("server.tls_cert"),
-			StaticDir:  viper.GetString("server.static_dir"),
-			PostsDir:   viper.GetString("server.posts_dir"),
-			PagesDir:   viper.GetString("server.pages_dir"),
-			AccessLog:  viper.GetString("server.access_log"),
-			ErrorLog:   viper.GetString("server.error_log"),
-			ProxyCount: viper.GetUint("server.proxy_count"),
+			Host:         viper.GetString("server.host"),
+			Port:         viper.GetUint("server.port"),
+			PortTLS:      viper.GetUint("server.port_tls"),
+			ForceTLS:     viper.GetBool("server.force_tls"),
+			TLSKey:       viper.GetString("server.tls_key"),
+			TLSCert:      viper.GetString("server.tls_cert"),
+			StaticDir:    viper.GetString("server.static_dir"),
+			PostsDir:     viper.GetString("server.posts_dir"),
+			PagesDir:     viper.GetString("server.pages_dir"),
+			TemplatesDir: viper.GetString("server.templates_dir"),
+			AccessLog:    viper.GetString("server.access_log"),
+			ErrorLog:     viper.GetString("server.error_log"),
+			ProxyCount:   viper.GetUint("server.proxy_count"),
 		},
 	}
 

@@ -28,23 +28,25 @@ func teardown(t *testing.T) {
 
 const yamlFmtString = `
 site:
-    title:                %s
-    description:          %s
-    author:               %s
+    title:                "%s"
+    description:          "%s"
+    author:               "%s"
     max_entries_per_page: %d
-    date_format:          %s
+    date_format:          "%s"
 server:
-    port:        %d
-    port_tls:    %d
-    force_tls:   %v
-    tls_key:     %s
-    tls_cert:    %s
-    static_dir:  %s
-    posts_dir:   %s
-    pages_dir:   %s
-    access_log:  %s
-    error_log:   %s
-    proxy_count: %d
+    host:          "%s"
+    port:          %d
+    port_tls:      %d
+    force_tls:     %v
+    tls_key:       "%s"
+    tls_cert:      "%s"
+    static_dir:    "%s"
+    posts_dir:     "%s"
+    pages_dir:     "%s"
+    templates_dir: "%s"
+    access_log:    "%s"
+    error_log:     "%s"
+    proxy_count:   %d
 `
 
 func yamlFromConfig(c *Config) string {
@@ -55,6 +57,7 @@ func yamlFromConfig(c *Config) string {
 		c.SiteConfig.Author,
 		c.SiteConfig.MaxEntriesPerPage,
 		c.SiteConfig.DateFormat,
+		c.ServerConfig.Host,
 		c.ServerConfig.Port,
 		c.ServerConfig.PortTLS,
 		c.ServerConfig.ForceTLS,
@@ -63,6 +66,7 @@ func yamlFromConfig(c *Config) string {
 		c.ServerConfig.StaticDir,
 		c.ServerConfig.PostsDir,
 		c.ServerConfig.PagesDir,
+		c.ServerConfig.TemplatesDir,
 		c.ServerConfig.AccessLog,
 		c.ServerConfig.ErrorLog,
 		c.ServerConfig.ProxyCount,
@@ -79,25 +83,28 @@ func TestLoadConfig(t *testing.T) {
 			Description:       "This is my blog",
 			Author:            "Johnny",
 			MaxEntriesPerPage: 5,
+			DateFormat:        "%F",
 		},
 		&ServerConfig{
-			Port:       80,
-			PortTLS:    443,
-			ForceTLS:   true,
-			TLSKey:     filepath.Join("path", "to", "key.pem"),
-			TLSCert:    filepath.Join("path", "to", "cert.pem"),
-			StaticDir:  filepath.Join("path", "to", "static"),
-			PostsDir:   filepath.Join("path", "to", "posts"),
-			PagesDir:   filepath.Join("path", "to", "pages"),
-			AccessLog:  filepath.Join("path", "to", "access.log"),
-			ErrorLog:   filepath.Join("path", "to", "error.log"),
-			ProxyCount: 1,
+			Host:         "localhost",
+			Port:         80,
+			PortTLS:      443,
+			ForceTLS:     true,
+			TLSKey:       filepath.Join("path", "to", "key.pem"),
+			TLSCert:      filepath.Join("path", "to", "cert.pem"),
+			StaticDir:    filepath.Join("path", "to", "static"),
+			PostsDir:     filepath.Join("path", "to", "posts"),
+			PagesDir:     filepath.Join("path", "to", "pages"),
+			TemplatesDir: filepath.Join("path", "to", "templates"),
+			AccessLog:    filepath.Join("path", "to", "access.log"),
+			ErrorLog:     filepath.Join("path", "to", "error.log"),
+			ProxyCount:   1,
 		},
 	}
 
 	yaml := yamlFromConfig(want)
 
-	fp := filepath.Join(tmpdir, "config.yaml")
+	fp := filepath.Join(tmpdir, "config.yml")
 	if err := ioutil.WriteFile(fp, []byte(yaml), 0644); err != nil {
 		t.Fatal(err)
 	}
