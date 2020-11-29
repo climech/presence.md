@@ -1,15 +1,19 @@
 # presence.md
 
-`presence.md` is a tiny HTTP server that generates a minimalistic blog from Markdown files.
+**presence.md** is a tiny HTTP server that generates a minimalistic, mobile-friendly blog from a collection of Markdown files. It makes publishing a post as simple as dropping a file in a directory.
+
+<p align="center">
+  <img src="assets/screen.png" width="100%" style="max-width: 600px" />
+</p>
 
 ## Features
 
-* In-memory store of articles updated on filesystem events
+* In-memory store of articles, updated on file system events
 * CommonMark-compliant
-* Syntax highlighting
+* Syntax highlighting for code blocks
 * Gzip compression
 * TLS support
-* RSS
+* RSS feed
 
 ## Installation
 
@@ -22,7 +26,7 @@ make test  # optional
 make && sudo make install
 ```
 
-Copy the example config to get started:
+Copy the example configuration:
 
 ```
 cp -r config/ ~/.config/presence
@@ -30,7 +34,7 @@ cp -r config/ ~/.config/presence
 
 ## Configuration
 
-Refer to the self-documented `config.yml` in the example config.
+Refer to the self-documented `config.yml` in the example configuration.
 
 ## Usage
 
@@ -38,7 +42,7 @@ To start the server, run `presence` in your terminal.
 
 ### Create a new post
 
-Create new Markdown document somewhere on your system with an URL-friendly filename, e.g. `words-separated-by-dashes.md`. The valid characters are: a-z, A-Z, 0-9, dashes and underscores.
+Create a new Markdown document somewhere on your system with a URL-friendly filename, e.g. `words-separated-by-dashes.md`. The valid characters are: a-z, A-Z, 0-9, dashes and underscores.
 
 ```
 # Hello world!
