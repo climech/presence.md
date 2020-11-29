@@ -40,10 +40,12 @@
 						<div class="separator">No posts.</div>
 				{{end}}
 
-				<nav class="pages">
-					{{if .Previous}}<span><a href="/{{.Previous}}/">« Newer</a></span>{{end}}
-					{{if .Next}}<span><a href="/{{.Next}}/">Older »</a></span>{{end}}
-				</nav>
+				{{if or .Previous .Next}}
+					<nav class="pages">
+						{{if .Previous}}<span><a href="/{{.Previous}}/">« Newer</a></span>{{end}}
+						{{if .Next}}<span><a href="/{{.Next}}/">Older »</a></span>{{end}}
+					</nav>
+				{{end}}
 			</main>
 
 			<footer>
