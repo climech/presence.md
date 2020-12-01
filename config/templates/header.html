@@ -1,0 +1,13 @@
+{{define "header"}}
+	{{$path := .Path}}
+	<header>
+		<h1 class="title">{{.Title}}</h1>
+		<nav>
+			<a href="/" {{if eq $path "/"}}class="selected"{{end}}>Home</a>
+			<a href="/archive" {{if eq $path "/archive"}}class="selected"{{end}}>Archive</a>
+			{{range .Pages}}
+				<a href="/{{.Slug}}" {{if eq $path (printf "/%s" .Slug)}}class="selected"{{end}}>{{.Title}}</a>
+			{{end}}
+		</nav>
+	</header>
+{{end}}

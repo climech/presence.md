@@ -138,25 +138,29 @@ func (s *Server) initTemplates() error {
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return err
 	}
+
 	templates := make(map[string]*template.Template)
-	filepaths := []string{
+	fps := []string{
 		filepath.Join(dir, "home.html"),
 		filepath.Join(dir, "article.html"),
 		filepath.Join(dir, "archive.html"),
 	}
-	// Group templates with their dependencies.
-	common := []string{
+	shared := []string{
 		filepath.Join(dir, "meta.html"),
+		filepath.Join(dir, "header.html"),
 		filepath.Join(dir, "footer.html"),
 	}
-	for _, filepath := range filepaths {
-		group := append([]string{filepath}, common...)
+
+	// Group templates with their dependencies.
+	for _, fp := range fps {
+		group := append([]string{fp}, shared...)
 		t, err := template.ParseFiles(group...)
 		if err != nil {
 			return err
 		}
 		templates[t.Name()] = t
 	}
+
 	s.templates = templates
 	return nil
 }

@@ -7,16 +7,7 @@
 	<body>
 		<div id="root">
 
-			<header>
-				<h1 class="title">{{.Title}}</h1>
-				<nav>
-					<a class="selected" href="/">Home</a>
-					<a href="/archive">Archive</a>
-					{{range .Pages}}
-						<a href="/{{.Slug}}">{{.Title}}</a>
-					{{end}}
-				</nav>
-			</header>
+			{{template "header" .}}
 
 			<main>
 				{{if .Posts}}
@@ -28,7 +19,7 @@
 									<span class="date"><a href="/{{$post.Slug}}">{{$post.Date}}</a></span>
 								{{end}}
 								{{if $post.Title}}
-								<h1 class="title"><a href="/{{$post.Slug}}">{{$post.Title}}</a></h1>
+									<h1 class="title"><a href="/{{$post.Slug}}">{{$post.Title}}</a></h1>
 								{{end}}
 							</header>
 							<main>
@@ -48,9 +39,7 @@
 				{{end}}
 			</main>
 
-			<footer>
-				{{template "footer" .}}
-			</footer>
+			{{template "footer" .}}
 
 		</div>
 	</body>

@@ -49,14 +49,16 @@ func (s *Server) newArticleDataSlice(articles []*model.Article) []*articleData {
 }
 
 type commonData struct {
+	Path        string
 	Title       string
 	Author      string
 	Description string
 	Pages       []*articleData
 }
 
-func (s *Server) newCommonData() *commonData {
+func (s *Server) newCommonData(r *http.Request) *commonData {
 	return &commonData{
+		Path:        r.URL.Path,
 		Title:       s.app.Config.Title,
 		Author:      s.app.Config.Author,
 		Description: s.app.Config.Description,
@@ -92,7 +94,7 @@ func (s *Server) handleHome(w http.ResponseWriter, r *http.Request) {
 		Previous int
 		Next     int
 	}{
-		s.newCommonData(),
+		s.newCommonData(r),
 		s.newArticleDataSlice(posts),
 		page - 1,
 		next,
@@ -132,7 +134,7 @@ func (s *Server) handleArticle(w http.ResponseWriter, r *http.Request) {
 		*commonData
 		Article *articleData
 	}{
-		s.newCommonData(),
+		s.newCommonData(r),
 		s.newArticleData(article),
 	}
 
@@ -174,7 +176,7 @@ func (s *Server) handleArchive(w http.ResponseWriter, r *http.Request) {
 		*commonData
 		Years []*yearData
 	}{
-		s.newCommonData(),
+		s.newCommonData(r),
 		years,
 	}
 

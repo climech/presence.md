@@ -7,16 +7,7 @@
 	<body>
 		<div id="root">
 
-			<header>
-				<h1 class="title">{{.Title}}</h1>
-				<nav>
-					<a href="/">Home</a>
-					<a href="/archive" class="selected">Archive</a>
-					{{range .Pages}}
-						<a href="/{{.Slug}}">{{.Title}}</a>
-					{{end}}
-				</nav>
-			</header>
+			{{template "header" .}}
 
 			<main>
 				<article>
@@ -40,9 +31,7 @@
 				</article>
 			</main>
 
-			<footer>
-				{{template "footer" .}}
-			</footer>
+			{{template "footer" .}}
 
 		</div>
 	</body>
